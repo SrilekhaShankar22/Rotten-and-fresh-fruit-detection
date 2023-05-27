@@ -1,0 +1,42 @@
+import os
+import shutil
+import random
+
+# Set the path to the folder containing the images
+data_path = 'path/to/images/folder'
+
+# Define the ratio of validation data
+validation_ratio = 0.2
+
+# Create the folder for the validation set
+os.makedirs(os.path.join(data_path, 'val'))
+
+# Loop over the subfolders in the data path
+for subdir in os.listdir(data_path):
+    subdir_path = os.path.join(data_path, subdir)
+    if os.path.isdir(subdir_path):
+        # Create the subfolders for the validation set
+        os.makedirs(os.path.join(data_path, 'val', subdir))
+        
+        # Get the list of filenames of all images in the subfolder
+        images = os.listdir(subdir_path)
+        
+        # Shuffle the images randomly
+        random.shuffle(images)
+        
+        # Split the images into training and validation sets
+        num_val = int(len(images) * validation_ratio)
+        val_images = images[:num_val]
+        train_images = images[num_val:]
+        
+        # Move the validation images to the validation folder
+        for image in val_images:
+            src_path = os.path.join(subdir_path, image)
+            dest_path = os.path.join(data_path, 'val', subdir, image)
+            shutil.move(src_path, dest_path)
+        
+        # Move the training images to the original subfolder
+        for image in train_images:
+            src_path = os.path.join(subdir_path, image)
+            dest_path = os.path.join(data_path, subdir, image)
+            shutil.move(src_path, dest_path)
